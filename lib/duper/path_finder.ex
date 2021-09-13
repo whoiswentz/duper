@@ -1,0 +1,23 @@
+defmodule Duper.PathFinder do
+  use GenServer
+
+  @me __MODULE__
+
+  def start_link(root_path) do
+    GenServer.start_link(__MODULE__, root_path, name: @me)
+  end
+
+  def init(root_path) do
+    DirWalker.start_link(root_path)
+  end
+
+  def handle_call(:next_path, _from, dir_walker) do
+    path =
+      case DirWalker.next(dir_walker) do
+        [path] -> path
+        other -> other
+      end
+
+    {:reply, path, dir_walker}
+  end
+end
